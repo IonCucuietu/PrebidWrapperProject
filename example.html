@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prebid.js Example</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script async src="//www.googletagservices.com/tag/js/gpt.js"></script>
+    <script async src="//cdn.jsdelivr.net/npm/prebid.js@latest/dist/not-for-prod/prebid.js"></script>
+    <script>
+        var div1Sizes = [
+            [400, 400],
+            [300, 600]
+        ];
+
+        var PREBID_TIMEOUT = 1000;
+        var FAILSAFE_TIMEOUT = 3000;
+
+        var adUnit = {
+            code: "/19968336/header-bid-tag-0",
+            mediaTypes: {
+                banner: {
+                    sizes: div1Sizes,
+                }
+            },
+            bids: [
+                {
+                    bidder: "adtelligent",
+                    params: {
+                        aid: 350975
+                    }
+                }
+            ]
+        };
+
+        var pbjs = pbjs || {};
+        pbjs.que = pbjs.que || [];
+
+        pbjs.que.push(function() {
+            pbjs.addAdUnits(adUnit);
+            pbjs.requestBids({
+                bidsBackHandler: render,
+                timeout: PREBID_TIMEOUT
+            });
+        });
+
+        function render() {
+            var adUnitCode = adUnit.code;
+            var iframe = document.createElement("iframe");
+            iframe.width = "500";
+            iframe.height = "450";
+            iframe.style.border = "none";
+
+            var slot = document.getElementById("div-1");
+            slot.appendChild(iframe);
+
+            var bid = pbjs.getBidResponsesForAdUnitCode(adUnitCode).bids[0];
+            if (bid) {
+                iframe.onload = function() {
+                    var doc = iframe.contentWindow.document;
+                    pbjs.renderAd(doc, bid.adId);
+                };
+            } else {
+                console.error("No valid bid found for ad unit code:", adUnitCode);
+            }
+        }
+    </script>
+</head>
+<body>
+<h2>Prebid.js Example</h2>
+<div id="div-1"></div>
+</body>
+</html>
